@@ -15,6 +15,8 @@ public class GameControllerPreguntas : MonoBehaviour
     List<PreguntasMultiples> listaPMF;
     List<PreguntasMultiples> listaPMD;
     List<PreguntasBool> listaPB;
+    List<PreguntasBool> listaPBF;
+    List<PreguntasBool> listaPBD;
 
     string lineaLeida;
     public TextMeshProUGUI txtPRegunta;
@@ -35,8 +37,8 @@ public class GameControllerPreguntas : MonoBehaviour
         listaPMF = new List<PreguntasMultiples>();
         listaPMD = new List<PreguntasMultiples>();
         listaPB = new List<PreguntasBool>();
-
-        txtDificultad.text = "MAURICIo";
+        listaPBF = new List<PreguntasBool>();
+        listaPBD = new List<PreguntasBool>();
 
     }
 
@@ -48,7 +50,6 @@ public class GameControllerPreguntas : MonoBehaviour
 
     public void leerPreguntasGeneral()
     {
-
         listaPB.Clear();
         listaPMF.Clear();
         listaPM.Clear();
@@ -190,12 +191,13 @@ public class GameControllerPreguntas : MonoBehaviour
                 string respuesta3 = lineapartida[3];
                 string respuesta4 = lineapartida[4];
                 string respuestaCorrecta = lineapartida[5];
-                string versiculo = lineapartida[6];
-                string dicultad = lineapartida[7];
+                string versiculo = string.Join("-", lineapartida, 6, lineapartida.Length - 7);
+                string dicultad = lineapartida[lineapartida.Length - 1];
 
                 PreguntasMultiples objPM = new PreguntasMultiples(pregunta, respuesta1, respuesta2,
                     respuesta3, respuesta4, respuestaCorrecta, versiculo, dicultad);
 
+                listaPM.Add(objPM);
                 if (objPM.Dificultad.Equals("facil"))
                     {
                     listaPMF.Add(objPM);
@@ -204,10 +206,13 @@ public class GameControllerPreguntas : MonoBehaviour
                 {
                     listaPMD.Add(objPM);
                 }
-                listaPM.Add(objPM);
+                
 
             }
-            Debug.Log("Tama�o de la Lista preguntas multiple: " + listaPM.Count);
+            Debug.Log("verisiculo pregunta 15: " + listaPM[14].Versiculo);
+            Debug.Log("Tamaño de la Lista preguntas multiples: " + listaPM.Count);
+            Debug.Log("Tamaño de la Lista preguntas multiples faciles : " + listaPMF.Count);
+            Debug.Log("Tamaño de la Lista preguntas multiples dificiles: " + listaPMD.Count);
         }
         catch (Exception e)
         {
@@ -228,15 +233,27 @@ public class GameControllerPreguntas : MonoBehaviour
                 string[] lineapartida = lineaLeida.Split("-");
                 string pregunta = lineapartida[0];
                 string respuestaCorrecta = lineapartida[1];
-                string versiculo = lineapartida[2];
-                string dicultad = lineapartida[3];
+                string versiculo = string.Join("-", lineapartida, 2, lineapartida.Length - 3);
+                //en algunas preguntas 2 y 3 son el versiculo y 4 o 3 la dificultad
+                string dicultad = lineapartida[lineapartida.Length - 1];
 
                 PreguntasBool objPB = new PreguntasBool(pregunta, respuestaCorrecta, versiculo, dicultad);
-
                 listaPB.Add(objPB);
+                if (objPB.Dificultad.Equals("facil"))
+                    {
+                    listaPBF.Add(objPB);
+                }
+                if (objPB.Dificultad.Equals("dificil"))
+                {
+                    listaPBD.Add(objPB);
+                }
+                
 
             }
-            Debug.Log("Tama�o de la Lista preguntas Bool: " + listaPB.Count);
+            Debug.Log("verisiculo pregunta 4: " + listaPB[4].Versiculo);
+            Debug.Log("Tamaño de la Lista preguntas Bool: " + listaPB.Count);
+            Debug.Log("Tamaño de la Lista preguntas faciles Bool: " + listaPBF.Count);
+            Debug.Log("Tamaño de la Lista preguntas dificiles Bool: " + listaPBD.Count);
         }
         catch (Exception e)
         {
