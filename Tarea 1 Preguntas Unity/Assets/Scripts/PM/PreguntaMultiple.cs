@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace models
 {
-    public class PreguntasMultiples
+    public class PreguntaMultiple
     {
         private string pregunta;
         private string respuesta1;
@@ -16,11 +16,11 @@ namespace models
         private string versiculo;
         private string dificultad;
 
-        public PreguntasMultiples()
+        public PreguntaMultiple()
         {
         }
 
-        public PreguntasMultiples(string pregunta, string respuesta1, string respuesta2, string respuesta3, string respuesta4, string respuestaCorrecta, string versiculo, string dificultad)
+        public PreguntaMultiple(string pregunta, string respuesta1, string respuesta2, string respuesta3, string respuesta4, string respuestaCorrecta, string versiculo, string dificultad)
         {
             this.pregunta = pregunta;
             this.respuesta1 = respuesta1;

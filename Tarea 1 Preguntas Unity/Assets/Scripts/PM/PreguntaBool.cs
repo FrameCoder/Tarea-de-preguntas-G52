@@ -5,16 +5,16 @@ using UnityEngine;
 
 namespace models
 {
-    public class PreguntasBool
+    public class PreguntaBool
     {
         private string pregunta;
         private string respuestaCorrecta;
         private string versiculo;
         private string dificultad;
-        public PreguntasBool()
+        public PreguntaBool()
         {
         }
-        public PreguntasBool(string pregunta, string respuestaCorrecta, string versiculo, string dificultad)
+        public PreguntaBool(string pregunta, string respuestaCorrecta, string versiculo, string dificultad)
         {
             this.pregunta = pregunta;
             this.respuestaCorrecta = respuestaCorrecta;

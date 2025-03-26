@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Random = System.Random;
@@ -11,34 +12,92 @@ using Random = System.Random;
 
 public class GameControllerPreguntas : MonoBehaviour
 {
-    List<PreguntasMultiples> listaPM;
-    List<PreguntasMultiples> listaPMF;
-    List<PreguntasMultiples> listaPMD;
-    List<PreguntasBool> listaPB;
-    List<PreguntasBool> listaPBF;
-    List<PreguntasBool> listaPBD;
+    public List<GameObject> listaGameObjects;
+    List<PreguntaMultiple> listaPM;
+    List<PreguntaMultiple> listaPMF;
+    List<PreguntaMultiple> listaPMD;
+    List<PreguntaBool> listaPB;
+    List<PreguntaBool> listaPBF;
+    List<PreguntaBool> listaPBD;
+    List<PreguntaAbierta> listaPA;
+    List<PreguntaAbierta> listaPAF;
+    List<PreguntaAbierta> listaPAD;
 
     string lineaLeida;
-    public TextMeshProUGUI txtPRegunta;
+    // Multiples
+    public TextMeshProUGUI txtPreguntaM;
     public TextMeshProUGUI txtRespuesta1;
     public TextMeshProUGUI txtRespuesta2;
     public TextMeshProUGUI txtRespuesta3;
     public TextMeshProUGUI txtRespuesta4;
-    public TextMeshProUGUI txtDificultad;
-    public object respuestaCorrecta;
-    public string respuestas;
+
+    // Abiertas
+    public TextMeshProUGUI txtPreguntaA;
+    public TextMeshProUGUI txtRespuestaA;
+
+    // Falso Verdadero
+    public TextMeshProUGUI txtPreguntaFV;
+    public TextMeshProUGUI txtRespuestaF;
+    public TextMeshProUGUI txtRespuestaV;
+
+    //dif
+
+    public TextMeshProUGUI txtDifucultad;
+    
+    //
+    public TextMeshProUGUI txtAciertos;
+    public TextMeshProUGUI txtErrores;
+
+    public GameObject panelMultiples;
+    public GameObject panelAbiertas;
+    public GameObject panelFalsoVerdadero;
+    public GameObject panelComenzar;
+    public GameObject panelFinal;
+    public string respuestaCorrecta;
     public int aciertos;
     public int errores;
+
+    public int dificultadRonda;
+    public string dificultad;
+    public int canPreguntas;
+    public int rondaActual;
+    public int totalRondas;
+    public int dificultadActual;
+    public int cantidadClicks;
+    public int contadorE;
 
     // Start is called before the first frame update
     void Start()
     {
-        listaPM = new List<PreguntasMultiples>();
-        listaPMF = new List<PreguntasMultiples>();
-        listaPMD = new List<PreguntasMultiples>();
-        listaPB = new List<PreguntasBool>();
-        listaPBF = new List<PreguntasBool>();
-        listaPBD = new List<PreguntasBool>();
+        listaPM = new List<PreguntaMultiple>();
+        listaPMF = new List<PreguntaMultiple>();
+        listaPMD = new List<PreguntaMultiple>();
+        listaPB = new List<PreguntaBool>();
+        listaPBF = new List<PreguntaBool>();
+        listaPBD = new List<PreguntaBool>();
+        listaPA = new List<PreguntaAbierta>();
+        listaPAF = new List<PreguntaAbierta>();
+        listaPAD = new List<PreguntaAbierta>();
+
+        listaPM = GameObject.Find("LeerPM").GetComponent<LeerPM>().ListaPM;
+        listaPMF = GameObject.Find("LeerPM").GetComponent<LeerPM>().ListaPMF;
+        listaPMD = GameObject.Find("LeerPM").GetComponent<LeerPM>().ListaPMD;
+        listaPB = GameObject.Find("LeerPFV").GetComponent<LeerPFV>().ListaPB;
+        listaPBF = GameObject.Find("LeerPFV").GetComponent<LeerPFV>().ListaPBF;
+        listaPBD = GameObject.Find("LeerPFV").GetComponent<LeerPFV>().ListaPBD;
+        listaPA = GameObject.Find("LeerPA").GetComponent<LeerPA>().ListaPA;
+        listaPAF = GameObject.Find("LeerPA").GetComponent<LeerPA>().ListaPAF;
+        listaPAD = GameObject.Find("LeerPA").GetComponent<LeerPA>().ListaPAD;
+
+
+        canPreguntas = 20;
+        rondaActual = 0;
+        totalRondas = 2;
+        aciertos = 0;
+        errores = 0;
+        dificultadActual = 0;
+        cantidadClicks = 0;
+        contadorE = 0;
 
     }
 
@@ -48,218 +107,226 @@ public class GameControllerPreguntas : MonoBehaviour
 
     }
 
-    public void leerPreguntasGeneral()
+
+    public void comenzar()
     {
-        listaPB.Clear();
-        listaPMF.Clear();
-        listaPM.Clear();
-        listaPMD.Clear();
-        leerPreguntasMultiples();
-        leerPreguntasBoolean();
+        panelComenzar.SetActive(false);
+        mostrarPreguntas();
     }
 
+    public void cantidadClick()
+    {
+        cantidadClicks++;
+    }
     public void mostrarPreguntas()
     {
+        if (listaPAF.Count == 0 && listaPBF.Count == 0 && listaPMF.Count == 0)
+        {
+            dificultadActual = 1;
+            dificultad = "dificil";
+            Debug.Log("Dificultad Actual: " + dificultadActual);
+            txtDifucultad.text = dificultad;
+        }
+
+        if ((dificultadActual == 1 && listaPAD.Count == 0 && listaPBD.Count == 0 && listaPMD.Count == 0))
+        {
+            Debug.Log("¡No hay más preguntas disponibles!");
+            // Puedes aquí activar una pantalla de fin de juego
+            panelAbiertas.SetActive(false);
+            panelMultiples.SetActive(false);
+            panelFalsoVerdadero.SetActive(false);
+            panelFinal.SetActive(true);
+            txtAciertos.text = aciertos.ToString();
+            txtErrores.text = errores.ToString();
+            return;
+            
+        }
+
+
+
         Random random = new Random();
-        int tipoPregunta = random.Next(1, 3);
+        int tipoPregunta = random.Next(0, listaGameObjects.Count);
+        GameObject gameObject = listaGameObjects[tipoPregunta];
 
-        if (tipoPregunta == 1)
+
+
+        if (gameObject.GetComponent<LeerPA>() != null)
         {
-            int indiceAleatorioMul = random.Next(1, 40);
+            List<PreguntaAbierta> listaFiltrada = dificultadActual == 0 ? listaPAF : listaPAD;
+            if (listaFiltrada.Count > 0)
+            {
+                panelAbiertas.SetActive(true);
+                panelMultiples.SetActive(false);
+                panelFalsoVerdadero.SetActive(false);
+                int pregunta = random.Next(0, listaFiltrada.Count);
+                txtPreguntaA.text = listaFiltrada[pregunta].Pregunta;
+                respuestaCorrecta = listaFiltrada[pregunta].RespuestaCorrecta;
+                if (dificultadActual == 0)
+                {
+                    listaPAF.RemoveAt(pregunta);
+                }
+                else
+                {
+                    listaPAD.RemoveAt(pregunta);
+                }
+            }
+            else
+            {
+                mostrarPreguntas();
+            }
 
-            txtPRegunta.text = listaPM[indiceAleatorioMul].Pregunta;
-            txtRespuesta1.text = listaPM[indiceAleatorioMul].Respuesta1;
-            txtRespuesta2.text = listaPM[indiceAleatorioMul].Respuesta2;
-            txtRespuesta3.text = listaPM[indiceAleatorioMul].Respuesta3;
-            txtRespuesta4.text = listaPM[indiceAleatorioMul].Respuesta4;
-            respuestaCorrecta = listaPM[indiceAleatorioMul].RespuestaCorrecta;
         }
-        else if (tipoPregunta == 2)
+
+        if (gameObject.GetComponent<LeerPFV>() != null)
         {
-            int indiceAleatorioBl = random.Next(1, 18);
+            List<PreguntaBool> listaFiltrada = dificultadActual == 0 ? listaPBF : listaPBD;
 
-            txtPRegunta.text = listaPB[indiceAleatorioBl].Pregunta;
-            txtRespuesta1.text = "Verdadero";
-            txtRespuesta2.text = "Falso";
-            txtRespuesta3.text = "";
-            txtRespuesta4.text = "";
-            respuestaCorrecta = listaPB[indiceAleatorioBl].RespuestaCorrecta;
+            if (listaFiltrada.Count > 0)
+            {
+                panelAbiertas.SetActive(true);
+                panelAbiertas.SetActive(false);
+                panelMultiples.SetActive(false);
+                panelFalsoVerdadero.SetActive(true);
+
+                int pregunta = random.Next(0, listaFiltrada.Count);
+                txtPreguntaFV.text = listaFiltrada[pregunta].Pregunta;
+                respuestaCorrecta = listaFiltrada[pregunta].RespuestaCorrecta;
+
+                if (dificultadActual == 0)
+                {
+                    listaPBF.RemoveAt(pregunta);
+                }
+                else
+                {
+                    listaPBD.RemoveAt(pregunta);
+                }
+            }
+            else
+            {
+                mostrarPreguntas();
+            }
         }
+
+        if (gameObject.GetComponent<LeerPM>() != null)
+        {
+            List<PreguntaMultiple> listaFiltrada = dificultadActual == 0 ? listaPMF : listaPMD;
+            if (listaFiltrada.Count > 0)
+            {
+                panelAbiertas.SetActive(false);
+                panelMultiples.SetActive(true);
+                panelFalsoVerdadero.SetActive(false);
+                int pregunta = random.Next(0, listaFiltrada.Count);
+                txtPreguntaM.text = listaFiltrada[pregunta].Pregunta;
+                txtRespuesta1.text = listaFiltrada[pregunta].Respuesta1;
+                txtRespuesta2.text = listaFiltrada[pregunta].Respuesta2;
+                txtRespuesta3.text = listaFiltrada[pregunta].Respuesta3;
+                txtRespuesta4.text = listaFiltrada[pregunta].Respuesta4;
+                respuestaCorrecta = listaFiltrada[pregunta].RespuestaCorrecta;
+
+                if (dificultadActual == 0)
+                {
+                    listaPMF.RemoveAt(pregunta);
+                }
+                else
+                {
+                    listaPMD.RemoveAt(pregunta);
+                }
+            }
+        }
+
+
     }
 
-    #region respuestasMensaje(Anterior)
-    public void respuesta1()
+    public void mostrartamañolistas()
     {
-        if (txtRespuesta1.text.Equals(respuestaCorrecta))
-        {
-            Debug.Log("Respuesta Correcta");
-        }
-        else
-        {
-            Debug.Log("Respuesta Incorrecta");
-        }
+        Debug.Log("Lista Preguntas Abiertas Facil: " + listaPAF.Count);
+        Debug.Log("Lista Preguntas Multiples Facil: " + listaPMF.Count);
+        Debug.Log("Lista Preguntas Falso Verdadero Facil: " + listaPBF.Count);
+        Debug.Log("----------------------------------------------");
+        Debug.Log("Lista Preguntas Abiertas Dificil: " + listaPAD.Count);
+        Debug.Log("Lista Preguntas Multiples Dificil: " + listaPMD.Count);
+        Debug.Log("Lista Preguntas Falso Verdadero Dificil: " + listaPBD.Count);
+        Debug.Log("----------------------------------------------");
     }
 
-    public void respuesta2()
+
+
+    public void mostrarRespuesta()
     {
-        if (txtRespuesta2.text.Equals(respuestaCorrecta))
+        try
         {
-            Debug.Log("Respuesta Correcta");
+            txtRespuestaA.text = respuestaCorrecta;
         }
-        else
+        catch (Exception e)
         {
-            Debug.Log("Respuesta Incorrecta");
+            Debug.Log("ERROR AL MOSTRAR LA RESPUESTA" + e.ToString());
         }
-    }
-    public void respuesta3()
-    {
-        if (txtRespuesta3.text.Equals(respuestaCorrecta))
-        {
-            Debug.Log("Respuesta Correcta");
-        }
-        else
-        {
-            Debug.Log("Respuesta Incorrecta");
-        }
-    }
-    public void respuesta4()
-    {
-        if (txtRespuesta4.text.Equals(respuestaCorrecta))
-        {
-            Debug.Log("Respuesta Correcta");
-        }
-        else
-        {
-            Debug.Log("Respuesta Incorrecta");
-        }
+
     }
 
-    #endregion
-
-    public void VerificarRespuesta()
+    public void verificarRespuestaMultiples()
     {
         GameObject botonPresionado = EventSystem.current.currentSelectedGameObject;
         TextMeshProUGUI textoRespuesta = botonPresionado.GetComponentInChildren<TextMeshProUGUI>();
-
-        if (respuestaCorrecta.Equals("true") || respuestaCorrecta.Equals("false"))
+        string respuesta = textoRespuesta.text;
+        if (respuesta.Equals(respuestaCorrecta, StringComparison.OrdinalIgnoreCase))
         {
-            string textoRespuestaSuplemento = textoRespuesta.text.Equals("Verdadero") ? "true" : "false";
-
-            if (textoRespuestaSuplemento.Equals(respuestaCorrecta))
-            {
-                aciertos++;
-                Debug.Log("Respuesta Correcta" + "  - Aciertos: " + aciertos + "  - Errores: " + errores);
-                mostrarPreguntas();
-            }
-            else
-            {
-                errores++;
-                Debug.Log("Respuesta Incorrecta" + "  - Aciertos: " + aciertos + "  - Errores: " + errores);
-                mostrarPreguntas();
-            }
+            aciertos++;
+            Debug.Log("Respuesta Correcta");
+            mostrarPreguntas();
         }
         else
         {
-            if (textoRespuesta.text.Equals(respuestaCorrecta))
+            if (contadorE == 1)
             {
-                aciertos++;
-                Debug.Log("Respuesta Correcta" + "  - Aciertos: " + aciertos + "  - Errores: " + errores);
                 mostrarPreguntas();
+                contadorE = 0;
+
             }
-            else
+            errores++;
+            contadorE++;
+            Debug.Log("Respuesta Incorrecta");
+        }
+
+
+        /*if (txtRespuesta3 != null)
+        {
+            contadorE++;
+            if(contadorE == 2)
             {
-                errores++;
-                Debug.Log("Respuesta Incorrecta" + "  - Aciertos: " + aciertos + "  - Errores: " + errores);
                 mostrarPreguntas();
+                contadorE = 0;
             }
-        }
+            Debug.Log("Respuesta Incorrecta");
+        }*/
     }
 
-
-    #region Leer Preguntas Multiples
-    public void leerPreguntasMultiples()
+    public void verificarRespuestaFV()
     {
-        try
+        GameObject botonPresionado = EventSystem.current.currentSelectedGameObject;
+        TextMeshProUGUI textoRespuesta = botonPresionado.GetComponentInChildren<TextMeshProUGUI>();
+        string respuesta = textoRespuesta.text;
+        if (respuesta.Equals("Falso", StringComparison.OrdinalIgnoreCase))
         {
-            StreamReader sr1 = new StreamReader("Assets/Resources/Files/ArchivoPreguntasM.txt");
-            while ((lineaLeida = sr1.ReadLine()) != null)
-            {
-                string[] lineapartida = lineaLeida.Split("-");
-                string pregunta = lineapartida[0];
-                string respuesta1 = lineapartida[1];
-                string respuesta2 = lineapartida[2];
-                string respuesta3 = lineapartida[3];
-                string respuesta4 = lineapartida[4];
-                string respuestaCorrecta = lineapartida[5];
-                string versiculo = string.Join("-", lineapartida, 6, lineapartida.Length - 7);
-                string dicultad = lineapartida[lineapartida.Length - 1];
-
-                PreguntasMultiples objPM = new PreguntasMultiples(pregunta, respuesta1, respuesta2,
-                    respuesta3, respuesta4, respuestaCorrecta, versiculo, dicultad);
-
-                listaPM.Add(objPM);
-                if (objPM.Dificultad.Equals("facil"))
-                    {
-                    listaPMF.Add(objPM);
-                }
-                if (objPM.Dificultad.Equals("dificil"))
-                {
-                    listaPMD.Add(objPM);
-                }
-                
-
-            }
-            Debug.Log("verisiculo pregunta 15: " + listaPM[14].Versiculo);
-            Debug.Log("Tamaño de la Lista preguntas multiples: " + listaPM.Count);
-            Debug.Log("Tamaño de la Lista preguntas multiples faciles : " + listaPMF.Count);
-            Debug.Log("Tamaño de la Lista preguntas multiples dificiles: " + listaPMD.Count);
+            respuesta = "false";
         }
-        catch (Exception e)
+        if (respuesta.Equals("Verdadero", StringComparison.OrdinalIgnoreCase))
         {
-            Debug.Log("ERROR " + e.ToString());
+            respuesta = "true";
         }
+
+        if (respuesta.Equals(respuestaCorrecta, StringComparison.OrdinalIgnoreCase))
+        {
+            aciertos++;
+            Debug.Log("Respuesta Correcta");
+            mostrarPreguntas();
+        }
+        else
+        {
+            mostrarPreguntas();
+            errores++;
+            Debug.Log("Respuesta Incorrecta");
+        }
+
     }
-    #endregion
-
-
-    #region Leer Preguntas Bool
-    public void leerPreguntasBoolean()
-    {
-        try
-        {
-            StreamReader sr1 = new StreamReader("Assets/Resources/Files/preguntasFalso_Verdadero.txt");
-            while ((lineaLeida = sr1.ReadLine()) != null)
-            {
-                string[] lineapartida = lineaLeida.Split("-");
-                string pregunta = lineapartida[0];
-                string respuestaCorrecta = lineapartida[1];
-                string versiculo = string.Join("-", lineapartida, 2, lineapartida.Length - 3);
-                //en algunas preguntas 2 y 3 son el versiculo y 4 o 3 la dificultad
-                string dicultad = lineapartida[lineapartida.Length - 1];
-
-                PreguntasBool objPB = new PreguntasBool(pregunta, respuestaCorrecta, versiculo, dicultad);
-                listaPB.Add(objPB);
-                if (objPB.Dificultad.Equals("facil"))
-                    {
-                    listaPBF.Add(objPB);
-                }
-                if (objPB.Dificultad.Equals("dificil"))
-                {
-                    listaPBD.Add(objPB);
-                }
-                
-
-            }
-            Debug.Log("verisiculo pregunta 4: " + listaPB[4].Versiculo);
-            Debug.Log("Tamaño de la Lista preguntas Bool: " + listaPB.Count);
-            Debug.Log("Tamaño de la Lista preguntas faciles Bool: " + listaPBF.Count);
-            Debug.Log("Tamaño de la Lista preguntas dificiles Bool: " + listaPBD.Count);
-        }
-        catch (Exception e)
-        {
-            Debug.Log("ERROR " + e.ToString());
-        }
-    }
-    #endregion
-
 }
